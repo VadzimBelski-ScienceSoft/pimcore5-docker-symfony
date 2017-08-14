@@ -1,10 +1,6 @@
-# Docker Symfony (PHP7-FPM - NGINX - MySQL - ELK)
+# For Pimcore 5 Docker Symfony (PHP7-FPM - NGINX - MySQL - ELK)
 
-[![Build Status](https://travis-ci.org/maxpou/docker-symfony.svg?branch=master)](https://travis-ci.org/maxpou/docker-symfony)
-
-![](doc/schema.png)
-
-Docker-symfony gives you everything you need for developing Symfony application. This complete stack run with docker and [docker-compose (1.7 or higher)](https://docs.docker.com/compose/).
+Pimcore 5 Docker - symfony gives you everything you need for developing Symfony application. This complete stack run with docker and [docker-compose (1.7 or higher)](https://docs.docker.com/compose/).
 
 ## Installation
 
@@ -44,17 +40,8 @@ Docker-symfony gives you everything you need for developing Symfony application.
 
         ```bash
         $ docker-compose exec php bash
-        $ composer install
-        # Symfony2
-        $ sf doctrine:database:create
-        $ sf doctrine:schema:update --force
-        # Only if you have `doctrine/doctrine-fixtures-bundle` installed
-        $ sf doctrine:fixtures:load --no-interaction
-        # Symfony3
-        $ sf3 doctrine:database:create
-        $ sf3 doctrine:schema:update --force
-        # Only if you have `doctrine/doctrine-fixtures-bundle` installed
-        $ sf3 doctrine:fixtures:load --no-interaction
+        $ bin/install 
+        # follow instructions https://www.pimcore.org/docs/5.0.0/Getting_Started/Installation.html
         ```
 
 5. Enjoy :-)
