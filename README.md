@@ -41,7 +41,7 @@ Pimcore 5 Docker - symfony gives you everything you need for developing Symfony 
     2. Composer install & create database
 
         ```bash
-        $ docker-compose exec php bash
+        $ docker-compose exec --user www-data php bash
         $ bin/install 
         # follow instructions https://www.pimcore.org/docs/5.0.0/Getting_Started/Installation.html
         ```
