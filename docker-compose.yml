@@ -4,7 +4,7 @@ services:
     db:
         image: mysql:5.7
         volumes:
-            - "./.data/db:/var/lib/mysql"
+            - ./.data/db:/var/lib/mysql
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -13,13 +13,17 @@ services:
         command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     php:
         build: php7-fpm
+        links:
+          - db
         volumes:
             - ${SYMFONY_APP_PATH}:/var/www/symfony
             - ./logs/symfony:/var/www/symfony/app/logs
+            - ~/.composer:/var/www/.composer
+            - ~/.ssh:/var/www/.ssh
     nginx:
         build: nginx
         ports:
-            - 80:80
+            - 8080:80
         volumes_from:
             - php
         volumes:
@@ -27,7 +31,7 @@ services:
     elk:
         image: willdurand/elk
         ports:
-            - 81:80
+            - 8081:80
         volumes:
             - ./elk/logstash:/etc/logstash
             - ./elk/logstash/patterns:/opt/logstash/patterns
