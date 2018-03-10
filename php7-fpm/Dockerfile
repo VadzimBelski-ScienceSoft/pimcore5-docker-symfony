@@ -83,21 +83,29 @@ RUN apt-get -y install \
     && docker-php-ext-enable imagick \
     && rm -r /var/lib/apt/lists/*
 
-
-
 # install xdebug
 RUN pecl install xdebug
 RUN docker-php-ext-enable xdebug
-RUN echo "error_reporting = E_ALL" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "display_errors = Off" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+VOLUME /root/.composer/cache
+VOLUME /home/www-data/.composer/cache
+
+ADD bin/docker-environment /usr/local/bin/
+ADD etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
+ADD etc/mail.ini /usr/local/etc/php/conf.d/zz-mail.ini
+ADD etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug-settings.ini
+ADD etc/php-fpm.conf /usr/local/etc/
+
+ENV PHP_MEMORY_LIMIT 4096M
+ENV PHP_ENABLE_XDEBUG false
+ENV DEBUG false
+ENV UPDATE_UID_GID true
+ENV PIMCORE_ROOT /var/www/symfony
 
 RUN echo 'alias sf="php app/console"' >> ~/.bashrc
 RUN echo 'alias sf3="php bin/console"' >> ~/.bashrc
 
 WORKDIR /var/www/symfony
+
+ENTRYPOINT ["/usr/local/bin/docker-environment"]
+CMD ["php-fpm", "-F"]
