@@ -2,7 +2,7 @@ version: '2'
 
 services:
     db:
-        image: mysql:5.7
+        image: mariadb:10.3.5
         volumes:
             - ./.data/db:/var/lib/mysql
         environment:
@@ -15,6 +15,7 @@ services:
         build: php7-fpm
         links:
           - db
+          - redis
         volumes:
             - ${SYMFONY_APP_PATH}:/var/www/symfony
             - ./logs/symfony:/var/www/symfony/app/logs
@@ -22,8 +23,6 @@ services:
             - ~/.ssh:/var/www/.ssh
     nginx:
         build: nginx
-        ports:
-            - 8080:80
         volumes_from:
             - php
         volumes:
@@ -38,3 +37,17 @@ services:
         volumes_from:
             - php
             - nginx
+    redis:
+        image: redis:alpine
+    varnish:
+        image: million12/varnish
+        links:
+            - nginx
+        environment:
+            VCL_CONFIG: "/etc/varnish/default.vcl"
+            CACHE_SIZE: "64m"
+            VARNISHD_PARAMS: " -a :80 -p default_ttl=3600 -p default_grace=3600"
+        volumes:
+            - ./varnish/default.vcl:/etc/varnish/default.vcl
+        ports:
+            - 80:80

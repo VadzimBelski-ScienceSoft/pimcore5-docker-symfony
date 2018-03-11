@@ -1,14 +1,31 @@
-# See https://github.com/docker-library/php/blob/4677ca134fe48d20c820a19becb99198824d78e3/7.0/fpm/Dockerfile
-FROM php:7.0-fpm
+FROM php:7.2.3-fpm-stretch
 
-MAINTAINER Maxence POUTORD <maxence.poutord@gmail.com>
+MAINTAINER Vadzim Belski <belski@scnsoft.com>
 
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
-    libbz2-dev
-
-RUN apt-get install -y libpng12-dev
+    libbz2-dev \
+    zlib1g-dev \ 
+    libicu-dev \ 
+    g++ \
+    libreoffice \
+    libreoffice-script-provider-python \
+    libreoffice-math \
+    xfonts-75dpi \
+    poppler-utils \
+    inkscape \
+    libxrender1 \
+    libfontconfig1 \
+    ghostscript \
+    wget \
+    locales-all \
+    libimage-exiftool-perl \
+    libmagickwand-dev \
+        --no-install-recommends \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick \
+    && rm -r /var/lib/apt/lists/*
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -26,16 +43,25 @@ RUN docker-php-ext-install exif
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install mysqli
 RUN docker-php-ext-install zip
-
-# Pimcore 
-RUN apt-get update && apt-get install -y zlib1g-dev libicu-dev g++
+RUN docker-php-ext-install iconv
+RUN docker-php-ext-install dom
+RUN docker-php-ext-install simplexml
+RUN docker-php-ext-install mbstring
+RUN docker-php-ext-install zip
+RUN docker-php-ext-install bz2
+#Pimcore
 RUN docker-php-ext-configure intl
 RUN docker-php-ext-install intl
 
-RUN apt-get -y install libreoffice python-uno libreoffice-math xfonts-75dpi poppler-utils inkscape libxrender1 libfontconfig1 ghostscript
+# install PECL extensions
+RUN pecl install redis
+RUN docker-php-ext-enable redis
 
-# Install wget
-RUN apt-get -y install wget
+RUN docker-php-ext-install opcache
+
+RUN pecl install xdebug
+RUN docker-php-ext-enable xdebug
+
 
 # ZopfliPNG
 RUN wget https://github.com/imagemin/zopflipng-bin/raw/master/vendor/linux/zopflipng -O /usr/local/bin/zopflipng 
@@ -61,8 +87,6 @@ RUN chmod 0755 /usr/local/bin/advpng
 RUN wget https://github.com/imagemin/mozjpeg-bin/raw/master/vendor/linux/cjpeg -O /usr/local/bin/cjpeg
 RUN chmod 0755 /usr/local/bin/cjpeg
 
-# Exiftool
-RUN apt-get install -y libimage-exiftool-perl
 
 # ffmpeg
 RUN wget https://johnvansickle.com/ffmpeg/builds/ffmpeg-git-64bit-static.tar.xz -O ffmpeg.tar.xz ;\
@@ -74,24 +98,11 @@ ln -s /usr/local/ffmpeg/ffprobe /usr/local/bin/ ;\
 ln -s /usr/local/ffmpeg/qt-faststart /usr/local/bin/ ;\
 ln -s /usr/local/ffmpeg/qt-faststart /usr/local/bin/qtfaststart ;
 
-# imagick
-
-RUN apt-get -y install \
-            libmagickwand-dev \
-        --no-install-recommends \
-    && pecl install imagick \
-    && docker-php-ext-enable imagick \
-    && rm -r /var/lib/apt/lists/*
-
-# install xdebug
-RUN pecl install xdebug
-RUN docker-php-ext-enable xdebug
-
 VOLUME /root/.composer/cache
 VOLUME /home/www-data/.composer/cache
 
 ADD bin/docker-environment /usr/local/bin/
-ADD etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
+ADD etc/php.ini /usr/local/etc/php/conf.d/zz-pimcore.ini
 ADD etc/mail.ini /usr/local/etc/php/conf.d/zz-mail.ini
 ADD etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug-settings.ini
 ADD etc/php-fpm.conf /usr/local/etc/

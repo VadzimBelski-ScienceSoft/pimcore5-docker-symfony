@@ -1,8 +1,6 @@
-# For Pimcore 5 Docker Symfony (PHP7-FPM - NGINX - MySQL - ELK)
+# For Pimcore 5 Docker Symfony (PHP7.2-FPM - NGINX - VARNISH - MariaDB - Redis - ELK)
 
-This is based on https://github.com/maxpou/docker-symfony
-
-Pimcore 5 Docker - symfony gives you everything you need for developing Symfony application. This complete stack run with docker and [docker-compose (1.7 or higher)](https://docs.docker.com/compose/).
+Pimcore 5 Docker - gives you everything you need for developing Pimcore application. This complete stack run with docker and [docker-compose (1.7 or higher)](https://docs.docker.com/compose/).
 
 ## Installation
 
